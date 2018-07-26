@@ -27,7 +27,6 @@ int main(void)
     DEBUG_PRINT("LEDs Initialized...");
     fputs("Enter wait cycles for led animation: ", stdout);
     scanf("%lu", &cycles);
-    DEBUG_PRINT("Toggling LEDs...");
 
     while (1)
     {
