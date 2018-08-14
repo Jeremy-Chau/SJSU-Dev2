@@ -115,7 +115,6 @@ cd ${SJBASE}/firmware/HelloWorld
 #           Lint Check             #
 ####################################
 printf "\e[1;33m======================================================= \e[0m\n"
-<<<<<<< HEAD
 printf "\e[0;33mExecuting 'lint' check \e[0m"
 make lint 1> /dev/null
 LINT_CAPTURE=$?

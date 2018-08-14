@@ -21,28 +21,32 @@ int main(void)
     char input [] = "Hello World!";
 
     // Activates the initialize function with a baud rate of 38400 bits
-    // per second and activates UART 2. If this function fails, Fail will be printed out
-    if(test.Initialize(38400, 2) == 0)
+    // per second and activates UART 2. If this
+    // function fails, Fail will be printed out
+
+    if (test.Initialize(38400, 2) == 0)
     {
         printf("Fail!");
     }
 
-    while(1)
+    while (1)
     {
         // The for loop will loop until it hits the null character
         // in the array. This ensures the full message will be sent
         // without needing to know the length of the array.
-        for( int i=0; input[i] != '\0'; i++) test.Send(input2[i], 10);
+        for (int i=0; input[i] != '\0'; i++) test.Send(input2[i], 10);
+
         // This loop uses the length of the input array to determine
         // how long it will be running. The receive variable is grabbing
         // the return data from the Receive function.
-        for( int j=0; input[j] != '\0'; j++) // 12
+
+        for (int j=0; input[j] != '\0'; j++)  // 12
         {
             receive = test.Recieve(10);
-            printf("%c",receive);
-        } 
+            printf("%c", receive);
+        }
             printf("\n");
-        // Delay(1000);    
+        // Delay(1000);
     }
     return 0;
 }
