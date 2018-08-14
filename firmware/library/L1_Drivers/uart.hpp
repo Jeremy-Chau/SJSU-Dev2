@@ -89,7 +89,7 @@ class Uart : public Uart_interface
                 Tx.SetPinFunction(0b100);
                 Rx.SetPinFunction(0b100);
 
-                SetBaud(baud_rate);
+                SetBaudRate(baud_rate);
 
                 // Uart FIFO
                 UARTBaseReg->FCR |= (7 << 0);
@@ -116,7 +116,7 @@ class Uart : public Uart_interface
                 Tx.SetPinFunction(0b010);
                 Rx.SetPinFunction(0b010);
 
-                SetBaud(baud_rate);
+                SetBaudRate(baud_rate);
 
                 // Uart FIFO
                 UARTBaseReg1->FCR |= (7 << 0);
@@ -144,7 +144,7 @@ class Uart : public Uart_interface
                 Tx.SetPinFunction(0b010);
                 Rx.SetPinFunction(0b010);
 
-                SetBaud(baud_rate);
+                SetBaudRate(baud_rate);
 
                 // Uart FIFO
                 UARTBaseReg->FCR |= (7 << 0);
@@ -172,7 +172,7 @@ class Uart : public Uart_interface
                 Tx.SetPinFunction(0b010);
                 Rx.SetPinFunction(0b010);
 
-                SetBaud(baud_rate);
+                SetBaudRate(baud_rate);
 
                 // Uart FIFO
                 UARTBaseReg->FCR |= (7 << 0);
@@ -182,7 +182,7 @@ class Uart : public Uart_interface
             case 4:
             {
                 UARTBaseReg4 =
-                    reinterpret_cast<LPC_UART1_TypeDef *>(LPC_UART1_BASE);
+                    reinterpret_cast<LPC_UART4_TypeDef *>(LPC_UART4_BASE);
 
                 // Set Power bit
                 LPC_SC->PCONP &= ~(1 << 8);
@@ -200,7 +200,7 @@ class Uart : public Uart_interface
                 Tx.SetPinFunction(0b101);
                 Rx.SetPinFunction(0b011);
 
-                SetBaud(baud_rate);
+                SetBaudRate(baud_rate);
 
                 // Uart FIFO
                 UARTBaseReg4->FCR |= (7 << 0);
@@ -228,7 +228,7 @@ class Uart : public Uart_interface
             }
         }
         else if (UARTBaseReg4 ==
-            reinterpret_cast<LPC_UART1_TypeDef *>(LPC_UART1_BASE))
+            reinterpret_cast<LPC_UART4_TypeDef *>(LPC_UART4_BASE))
         {
             UARTBaseReg4->THR = out;
             while (counter > time_limit)
@@ -253,7 +253,7 @@ class Uart : public Uart_interface
         char mychar;
         uint32_t counter = 0;
         if (UARTBaseReg1 ==
-            reinterpret_cast<LPC_UART_TypeDef *>(LPC_UART0_BASE))
+            reinterpret_cast<LPC_UART1_TypeDef *>(LPC_UART1_BASE))
         {
             while (counter > time_limit)
             {
@@ -266,7 +266,7 @@ class Uart : public Uart_interface
             }
         }
        else if (UARTBaseReg4 ==
-            reinterpret_cast<LPC_UART1_TypeDef *>(LPC_UART1_BASE))
+            reinterpret_cast<LPC_UART4_TypeDef *>(LPC_UART4_BASE))
         {
             while (counter > time_limit)
             {
