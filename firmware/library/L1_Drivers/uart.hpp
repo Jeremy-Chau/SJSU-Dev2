@@ -7,61 +7,61 @@
 #include "L1_Drivers/pin_configure.hpp"
 
 
-class Uart_interface
+class UartInterface
 {
     virtual void SetBaudRate(uint32_t baud_rate) = 0;
     virtual bool Initialize(uint32_t baud_rate, uint32_t mode) = 0;
-    virtual void Send(char out, uint32_t time_limit) = 0;
-    virtual char Recieve(uint32_t time_limit) = 0;
+    virtual void Send(uint8_t out) = 0;
+    virtual uint8_t Receive() = 0;
 };
 
-class Uart : public Uart_interface
+class Uart : public UartInterface
 {
  public:
     LPC_UART_TypeDef * UARTBaseReg;
     LPC_UART1_TypeDef * UARTBaseReg1;
     LPC_UART4_TypeDef * UARTBaseReg4;
 
-    void SetBaudRate(uint32_t baud_rate) override
+void SetBaudRate(uint32_t baud_rate) override
     {
-        if (UARTBaseReg1 ==
-            reinterpret_cast<LPC_UART1_TypeDef *>(LPC_UART1_BASE))
-        {
-            float baudrate = static_cast<float>(baud_rate);
+       if (UARTBaseReg1 ==
+           reinterpret_cast<LPC_UART1_TypeDef *>(LPC_UART1_BASE))
+       {
+           float baudrate = static_cast<float>(baud_rate);
 
-            // Set baud rate
-            UARTBaseReg1 -> LCR |= (1 << 7);
-            uint32_t div =
-                static_cast<uint32_t>(OSC_CLK / (16.0f * baudrate) + 0.5f);
-            UARTBaseReg1 -> DLM = static_cast<uint8_t>(div >> 8);
-            UARTBaseReg1 -> DLL = static_cast<uint8_t>(div >> 0);
-            UARTBaseReg1 -> LCR = 3;
-        }
-        else if (UARTBaseReg4 ==
-            reinterpret_cast<LPC_UART4_TypeDef *>(LPC_UART4_BASE))
-        {
-            float baudrate = static_cast<float>(baud_rate);
+           // Set baud rate
+           UARTBaseReg1 -> LCR |= (1 << 7);
+           uint32_t div =
+               static_cast<uint32_t>(OSC_CLK / (16.0f * baudrate) + 0.5f);
+           UARTBaseReg1 -> DLM = static_cast<uint8_t>(div >> 8);
+           UARTBaseReg1 -> DLL = static_cast<uint8_t>(div >> 0);
+           UARTBaseReg1 -> LCR = 3;
+       }
+       else if (UARTBaseReg4 ==
+           reinterpret_cast<LPC_UART4_TypeDef *>(LPC_UART4_BASE))
+       {
+           float baudrate = static_cast<float>(baud_rate);
 
-            // Set baud rate
-            UARTBaseReg4 -> LCR |= (1 << 7);
-            uint32_t div =
-                static_cast<uint32_t>(OSC_CLK / (16.0f * baudrate) + 0.5f);
-            UARTBaseReg4 -> DLM = static_cast<uint8_t>(div >> 8);
-            UARTBaseReg4 -> DLL = static_cast<uint8_t>(div >> 0);
-            UARTBaseReg4 -> LCR = 3;
-        }
-        else
-        {
-            float baudrate = static_cast<float>(baud_rate);
+           // Set baud rate
+           UARTBaseReg4 -> LCR |= (1 << 7);
+           uint32_t div =
+               static_cast<uint32_t>(OSC_CLK / (16.0f * baudrate) + 0.5f);
+           UARTBaseReg4 -> DLM = static_cast<uint8_t>(div >> 8);
+           UARTBaseReg4 -> DLL = static_cast<uint8_t>(div >> 0);
+           UARTBaseReg4 -> LCR = 3;
+       }
+       else
+       {
+           float baudrate = static_cast<float>(baud_rate);
 
-            // Set baud rate
-            UARTBaseReg -> LCR |= (1 << 7);
-            uint32_t div =
-                static_cast<uint32_t>(OSC_CLK / (16.0f * baudrate) + 0.5f);
-            UARTBaseReg -> DLM = static_cast<uint8_t>(div >> 8);
-            UARTBaseReg -> DLL = static_cast<uint8_t>(div >> 0);
-            UARTBaseReg -> LCR = 3;
-        }
+           // Set baud rate
+           UARTBaseReg -> LCR |= (1 << 7);
+           uint32_t div =
+               static_cast<uint32_t>(OSC_CLK / (16.0f * baudrate) + 0.5f);
+           UARTBaseReg -> DLM = static_cast<uint8_t>(div >> 8);
+           UARTBaseReg -> DLL = static_cast<uint8_t>(div >> 0);
+           UARTBaseReg -> LCR = 3;
+       }
     }
 
     bool Initialize(uint32_t baud_rate, uint32_t mode) override
@@ -154,7 +154,7 @@ class Uart : public Uart_interface
             case 3:
             {
                 UARTBaseReg =
-                    reinterpret_cast<LPC_UART_TypeDef *>(LPC_UART0_BASE);
+                    reinterpret_cast<LPC_UART_TypeDef *>(LPC_UART3_BASE);
 
                 // Set Power bit
                 LPC_SC->PCONP &= ~(1 << 25);
@@ -214,81 +214,67 @@ class Uart : public Uart_interface
         }
     }
 
-    void Send(char out, uint32_t time_limit) override
+    void Send(uint8_t out) override
     {
-        uint32_t counter = 0;
         if (UARTBaseReg1 ==
             reinterpret_cast<LPC_UART1_TypeDef *>(LPC_UART1_BASE))
         {
             UARTBaseReg1->THR = out;
-            while (counter > time_limit)
+            while (!(UARTBaseReg1->LSR & (1 << 5)))
             {
-                if (!(UARTBaseReg1->LSR & (1 << 5))) {counter++;}
-                else {break;}
+                continue;
             }
         }
         else if (UARTBaseReg4 ==
             reinterpret_cast<LPC_UART4_TypeDef *>(LPC_UART4_BASE))
         {
             UARTBaseReg4->THR = out;
-            while (counter > time_limit)
+            while (!(UARTBaseReg4->LSR & (1 << 5)))
             {
-                if (!(UARTBaseReg4->LSR & (1 << 5))){counter++;}
-                else {break;}
+                continue;
             }
         }
         else
         {
             UARTBaseReg->THR = out;
-            while (counter > time_limit)
+            while (!(UARTBaseReg->LSR & (1 << 5)))
             {
-                if (!(UARTBaseReg->LSR & (1 << 5))){counter++;}
-                else {break;}
+                continue;
             }
         }
     }
 
-    char Recieve(uint32_t time_limit) override
+    uint8_t Receive() override
     {
-        char mychar;
-        uint32_t counter = 0;
+        uint8_t receiver;
         if (UARTBaseReg1 ==
             reinterpret_cast<LPC_UART1_TypeDef *>(LPC_UART1_BASE))
         {
-            while (counter > time_limit)
+            while (!(UARTBaseReg1->LSR & (1 << 0)))
             {
-                if (!(UARTBaseReg1->LSR & (1 << 0))){counter++;}
-                else
-                {
-                    mychar = static_cast<char>(UARTBaseReg1->RBR);
-                    return mychar;
-                }
+                continue;
             }
+            receiver = static_cast<uint8_t>(UARTBaseReg1->RBR);
+            return receiver;
         }
-       else if (UARTBaseReg4 ==
+        else if (UARTBaseReg4 ==
             reinterpret_cast<LPC_UART4_TypeDef *>(LPC_UART4_BASE))
         {
-            while (counter > time_limit)
+            while (!(UARTBaseReg4->LSR & (1 << 0)))
             {
-                if (!(UARTBaseReg4->LSR & (1 << 0))){counter++;}
-                else
-                {
-                    mychar = static_cast<char>(UARTBaseReg4->RBR);
-                    return mychar;
-                }
+                continue;
             }
-       }
+            receiver = static_cast<uint8_t>(UARTBaseReg4->RBR);
+            return receiver;
+        }
         else
         {
-            while (counter > time_limit)
+            while (!(UARTBaseReg->LSR & (1 << 0)))
             {
-                if (!(UARTBaseReg->LSR & (1 << 0))){counter++;}
-                else
-                {
-                    mychar = static_cast<char>(UARTBaseReg->RBR);
-                    return mychar;
-                }
+                continue;
             }
+            receiver = static_cast<uint8_t>(UARTBaseReg->RBR);
+            return receiver;
         }
         return 0;
     }

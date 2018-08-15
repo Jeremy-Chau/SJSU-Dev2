@@ -326,7 +326,6 @@ void InitializeFreeRTOSSystemTick()
     }
 }
 
-
 void SetupTimerInterrupt()
 {
     DEBUG_PRINT("Setting up SystemTick Timer...");
